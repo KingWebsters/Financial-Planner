@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Budget">
+<title>Budget Planner</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh;padding:12px 12px 60px}
+.pw{max-width:420px;margin:0 auto}
+h1{font-size:18px;font-weight:600;margin-bottom:14px;color:#1a1a1a}
+.tabs{display:flex;gap:5px;margin-bottom:12px;background:#e8e8e3;border-radius:10px;padding:4px}
+.tab{flex:1;padding:7px 2px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:#888;text-align:center;border:none;transition:all .15s}
+.tab.on{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.card{background:#fff;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none}
+.ctitle{font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.camt{font-size:15px;font-weight:600;color:#1a1a1a}
+.chev{font-size:10px;color:#aaa;transition:transform .2s;margin-left:6px}
+.cb{border-top:1px solid #f0f0ec;padding:14px 16px}
+.row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+.row:last-child{margin-bottom:0}
+.rlbl{flex:1;min-width:0;font-size:14px;color:#1a1a1a}
+.rsub{font-size:11px;color:#aaa;margin-top:2px}
+.ramt{font-size:14px;font-weight:600;min-width:70px;text-align:right;padding-top:1px}
+.xbtn{background:none;border:none;cursor:pointer;color:#ccc;font-size:14px;padding:2px 6px;border-radius:6px;flex-shrink:0;margin-top:1px}
+.xbtn:active{background:#ffe8e8;color:#e24b4a}
+label{font-size:12px;color:#888;display:block;margin-bottom:4px;margin-top:10px}
+label:first-child{margin-top:0}
+input,select{font-size:15px;border:1.5px solid #e8e8e3;border-radius:10px;padding:10px 12px;background:#fafaf8;color:#1a1a1a;width:100%;outline:none;-webkit-appearance:none;transition:border-color .15s}
+input:focus,select:focus{border-color:#534AB7}
+input::placeholder{color:#ccc}
+.income-row{display:flex;align-items:center;gap:8px}
+.income-row .dollar{font-size:22px;font-weight:600;color:#aaa}
+.income-row input{font-size:26px;font-weight:600;border:none;background:transparent;padding:4px 0}
+.add-grid{display:grid;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0ec}
+.abtn{background:#534AB7;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;color:#fff;width:100%}
+.abtn:active{background:#3C3489}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.metric{background:#f5f5f0;border-radius:12px;padding:14px}
+.mlbl{font-size:11px;color:#888;margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.mval{font-size:20px;font-weight:700;color:#1a1a1a}
+.mpct{font-size:11px;color:#aaa;margin-top:2px}
+.hi{background:#e1f5ee}.hi .mval{color:#085041}
+.warn-m{background:#faece7}.warn-m .mval{color:#712b13}
+.bar-wrap{margin-bottom:14px}
+.bar-lbl{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:5px}
+.bar-track{height:8px;background:#eee;border-radius:4px;overflow:hidden;display:flex}
+.bar-seg{height:100%;transition:width .4s}
+.leg{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap}
+.leg span{font-size:11px;color:#888;display:flex;align-items:center;gap:4px}
+.leg i{width:9px;height:9px;border-radius:2px;display:inline-block;flex-shrink:0}
+.pcrd{border-left:4px solid #3B6D11;border-radius:14px;padding:14px 16px;margin-bottom:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.pcrd.c2{border-left-color:#185FA5}.pcrd.c3{border-left-color:#534AB7}
+.phead{font-size:15px;font-weight:700;color:#1a1a1a}
+.psub{font-size:12px;color:#aaa;margin-bottom:10px}
+.prow{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f5f5f0}
+.prow:last-child{border-bottom:none;font-weight:700;font-size:14px;padding-top:8px;margin-top:4px}
+.prow-due{font-size:11px;color:#aaa;margin-left:5px}
+.tip{background:#f0effe;border-radius:12px;padding:12px 14px;font-size:13px;color:#534AB7;margin-bottom:12px;border-left:4px solid #534AB7}
+.rank{font-size:24px;font-weight:700;color:#ddd;min-width:32px;line-height:1}
+.rank.r1{color:#3B6D11}
+.badge{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;font-weight:700;background:#e1f5ee;color:#085041;margin-left:6px;vertical-align:middle}
+.empty{font-size:13px;color:#bbb;font-style:italic;padding:2px 0}
+.hint{font-size:11px;color:#bbb;margin-top:8px}
+.over-lbl{color:#a32d2d;font-weight:700}
+.under-lbl{color:#0f6e56;font-weight:700}
+.empty-state{text-align:center;padding:32px 16px;color:#bbb;font-size:13px}
+</style>
+</head>
+<body>
+<div class="pw">
+  <h1>💰 Budget Planner</h1>
+  <div class="tabs">
+    <button class="tab on" id="t-budget" onclick="showTab('budget')">Budget</button>
+    <button class="tab" id="t-checks" onclick="showTab('checks')">Checks</button>
+    <button class="tab" id="t-payoff" onclick="showTab('payoff')">Payoff</button>
+    <button class="tab" id="t-overview" onclick="showTab('overview')">Overview</button>
+  </div>
+
+  <!-- BUDGET -->
+  <div id="v-budget">
+    <div class="card">
+      <div class="ch" onclick="tog('schedule')">
+        <div class="ctitle"><span class="dot" style="background:#534AB7"></span>Pay schedule</div>
+        <div style="display:flex;align-items:center"><span id="ps-lbl" style="font-size:12px;color:#aaa">Not set</span><span class="chev" id="cv-schedule">▼</span></div>
+      </div>
+      <div class="cb" id="b-schedule" style="display:none">
+        <label>Pay frequency</label>
+        <select id="ps-freq" onchange="onFreqChange()">
+          <option value="biweekly">Every 2 weeks (bi-weekly)</option>
+          <option value="weekly">Every week</option>
+          <option value="semimonthly">Twice a month</option>
+          <option value="monthly">Once a month</option>
+        </select>
+        <div id="ps-extra"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch" onclick="tog('income')">
+        <div class="ctitle"><span class="dot" style="background:#0F6E56"></span>Monthly income</div>
+        <div style="display:flex;align-items:center"><span id="d-income" class="camt">$0</span><span class="chev" id="cv-income">▼</span></div>
+      </div>
+      <div class="cb" id="b-income" style="display:none">
+        <div class="income-row"><span class="dollar">$</span><input id="in-income" type="number" inputmode="decimal" placeholder="0.00" oninput="onIncome()"></div>
+        <div class="hint" id="per-check"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch" onclick="tog('bills')">
+        <div class="ctitle"><span class="dot" style="background:#3B6D11"></span>Bills</div>
+        <div style="display:flex;align-items:center"><span id="d-bills" class="camt">$0</span><span class="chev" id="cv-bills">▼</span></div>
+      </div>
+      <div class="cb" id="b-bills" style="display:none">
+        <div id="list-bills"><p class="empty">No bills yet</p></div>
+        <div class="add-grid" style="grid-template-columns:1fr 1fr">
+          <input id="bn" placeholder="Name (e.g. Rent)" style="grid-column:1/-1">
+          <input id="ba" type="number" inputmode="decimal" placeholder="$/month">
+          <input id="bd" type="number" inputmode="numeric" min="1" max="31" placeholder="Due day (1–31)">
+          <input id="bb" type="number" inputmode="decimal" placeholder="Balance owed $" style="grid-column:1/-1">
+          <button class="abtn" onclick="addBill()" style="grid-column:1/-1">+ Add Bill</button>
+        </div>
+        <div class="hint" style="margin-top:8px">Due day = day of month bill is due. Balance = total owed (optional).</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch" onclick="tog('needs')">
+        <div class="ctitle"><span class="dot" style="background:#185FA5"></span>Necessities</div>
+        <div style="display:flex;align-items:center"><span id="d-needs" class="camt">$0</span><span class="chev" id="cv-needs">▼</span></div>
+      </div>
+      <div class="cb" id="b-needs" style="display:none">
+        <div id="list-needs"><p class="empty">No necessities yet</p></div>
+        <div class="add-grid" style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f0ec">
+          <input id="nn" placeholder="Name (e.g. Gas, Groceries)">
+          <input id="na" type="number" inputmode="decimal" placeholder="$/month">
+          <button class="abtn" onclick="addNeed()">+ Add Necessity</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKS -->
+  <div id="v-checks" style="display:none"><div id="checks-body"></div></div>
+
+  <!-- PAYOFF -->
+  <div id="v-payoff" style="display:none"><div id="payoff-body"></div></div>
+
+  <!-- OVERVIEW -->
+  <div id="v-overview" style="display:none">
+    <div class="grid2">
+      <div class="metric"><div class="mlbl">Income</div><div class="mval" id="s-inc">$0</div></div>
+      <div class="metric" id="m-rem"><div class="mlbl">Spending</div><div class="mval" id="s-rem">$0</div><div class="mpct" id="s-rempct"></div></div>
+      <div class="metric"><div class="mlbl">Bills</div><div class="mval" id="s-bil">$0</div><div class="mpct" id="s-bilpct"></div></div>
+      <div class="metric"><div class="mlbl">Necessities</div><div class="mval" id="s-nds">$0</div><div class="mpct" id="s-ndspct"></div></div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-lbl"><span>Budget allocation</span><span id="bar-used">0% used</span></div>
+      <div class="bar-track">
+        <div class="bar-seg" id="bar-b" style="background:#639922;width:0%"></div>
+        <div class="bar-seg" id="bar-n" style="background:#378ADD;width:0%"></div>
+        <div class="bar-seg" id="bar-r" style="background:#c8c4f8;width:0%"></div>
+      </div>
+      <div class="leg">
+        <span><i style="background:#639922"></i>Bills</span>
+        <span><i style="background:#378ADD"></i>Necessities</span>
+        <span><i style="background:#c8c4f8;border:1px solid #534AB7"></i>Remaining</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch" style="cursor:default"><div class="ctitle"><span class="dot" style="background:#3B6D11"></span>Bills</div></div>
+      <div class="cb" id="s-lb" style="display:block"><p class="empty">None added</p></div>
+    </div>
+    <div class="card" style="margin-top:0">
+      <div class="ch" style="cursor:default"><div class="ctitle"><span class="dot" style="background:#185FA5"></span>Necessities</div></div>
+      <div class="cb" id="s-ln" style="display:block"><p class="empty">None added</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let S={income:0,paySchedule:{freq:'biweekly',refDate:'',semiDays:[1,15],monthDay:1},bills:[],needs:[]};
+let openSec={};
+
+function load(){
+  try{const d=localStorage.getItem('budget_planner');if(d)S=JSON.parse(d);}catch(e){}
+  document.getElementById('in-income').value=S.income||'';
+  document.getElementById('ps-freq').value=S.paySchedule.freq||'biweekly';
+  renderFreqExtra();render();
+}
+
+function save(){try{localStorage.setItem('budget_planner',JSON.stringify(S));}catch(e){}}
+
+function fmt(n){if(isNaN(n))return'$0.00';return'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fdate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function ord(n){const s=['th','st','nd','rd'];const v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+function pct(a,b){return b>0?Math.round(a/b*100):0;}
+
+function perCheckIncome(){
+  const f=S.paySchedule.freq;
+  if(f==='monthly')return S.income;
+  if(f==='semimonthly')return S.income/2;
+  if(f==='biweekly')return S.income*12/26;
+  if(f==='weekly')return S.income*12/52;
+  return S.income;
+}
+
+function onFreqChange(){S.paySchedule.freq=document.getElementById('ps-freq').value;renderFreqExtra();save();render();}
+
+function renderFreqExtra(){
+  const ps=S.paySchedule,freq=ps.freq,el=document.getElementById('ps-extra');
+  if(freq==='biweekly'||freq==='weekly'){
+    el.innerHTML=`<label>Most recent or upcoming payday</label><input type="date" id="ps-ref" value="${ps.refDate||''}" onchange="onRefDate()">`;
+  }else if(freq==='semimonthly'){
+    const[d1,d2]=ps.semiDays||[1,15];
+    el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="margin-top:0">1st payday</label><input type="number" inputmode="numeric" min="1" max="28" id="ps-d1" value="${d1}" onchange="onSemiDays()"></div><div><label style="margin-top:0">2nd payday</label><input type="number" inputmode="numeric" min="1" max="28" id="ps-d2" value="${d2}" onchange="onSemiDays()"></div></div>`;
+  }else{
+    el.innerHTML=`<label>Payday (day of month)</label><input type="number" inputmode="numeric" min="1" max="28" id="ps-md" value="${ps.monthDay||1}" onchange="onMonthDay()">`;
+  }
+  updatePsLbl();
+}
+
+function onRefDate(){S.paySchedule.refDate=document.getElementById('ps-ref').value;save();render();}
+function onSemiDays(){S.paySchedule.semiDays=[parseInt(document.getElementById('ps-d1').value)||1,parseInt(document.getElementById('ps-d2').value)||15];save();render();}
+function onMonthDay(){S.paySchedule.monthDay=parseInt(document.getElementById('ps-md').value)||1;save();render();}
+
+function updatePsLbl(){
+  const ps=S.paySchedule,el=document.getElementById('ps-lbl');
+  if(ps.freq==='biweekly')el.textContent=ps.refDate?'Every 2 weeks':'Set date →';
+  else if(ps.freq==='weekly')el.textContent=ps.refDate?'Every week':'Set date →';
+  else if(ps.freq==='semimonthly')el.textContent=`${ord(ps.semiDays[0])} & ${ord(ps.semiDays[1])}`;
+  else el.textContent=`${ord(ps.monthDay)} of month`;
+}
+
+function getPaydays(count){
+  const ps=S.paySchedule,today=new Date();today.setHours(0,0,0,0);const res=[];
+  if(ps.freq==='biweekly'||ps.freq==='weekly'){
+    if(!ps.refDate)return[];
+    const interval=ps.freq==='weekly'?7:14;
+    const ref=new Date(ps.refDate+'T00:00:00');
+    let cur=new Date(ref);
+    if(cur<today){const ms=today-cur;const p=Math.ceil(ms/(interval*86400000));cur.setDate(cur.getDate()+p*interval);}
+    for(let i=0;i<count;i++){res.push(new Date(cur));cur.setDate(cur.getDate()+interval);}
+  }else if(ps.freq==='semimonthly'){
+    const days=[...(ps.semiDays||[1,15])].sort((a,b)=>a-b);
+    let y=today.getFullYear(),m=today.getMonth();
+    while(res.length<count){const dim=new Date(y,m+1,0).getDate();for(const d of days){const dt=new Date(y,m,Math.min(d,dim));if(dt>=today&&res.length<count)res.push(new Date(dt));}m++;if(m>11){m=0;y++;}}
+  }else{
+    const d=ps.monthDay||1;let y=today.getFullYear(),m=today.getMonth();
+    while(res.length<count){const dim=new Date(y,m+1,0).getDate();const dt=new Date(y,m,Math.min(d,dim));if(dt>=today)res.push(new Date(dt));m++;if(m>11){m=0;y++;}}
+  }
+  return res;
+}
+
+function nextDueDate(dueDay,fromDate){
+  let y=fromDate.getFullYear(),m=fromDate.getMonth();
+  const dim=new Date(y,m+1,0).getDate();
+  let dt=new Date(y,m,Math.min(dueDay,dim));
+  if(dt<fromDate){m++;if(m>11){m=0;y++;}dt=new Date(y,m,Math.min(dueDay,new Date(y,m+1,0).getDate()));}
+  return dt;
+}
+
+function getBillsInPeriod(start,end){
+  return S.bills.filter(b=>b.dueDay).map(b=>{const dd=nextDueDate(b.dueDay,start);return{...b,dueDate:dd};}).filter(b=>b.dueDate>=start&&b.dueDate<=end).sort((a,b)=>a.dueDate-b.dueDate);
+}
+
+function render(){
+  updatePsLbl();renderBudget();renderChecks();renderPayoff();renderOverview();
+  const pc=perCheckIncome();
+  document.getElementById('per-check').textContent=S.income&&S.paySchedule.freq?`≈ ${fmt(pc)} per paycheck`:'';
+}
+
+function renderBudget(){
+  const bt=S.bills.reduce((s,x)=>s+x.amt,0),nt=S.needs.reduce((s,x)=>s+x.amt,0);
+  document.getElementById('d-income').textContent=fmt(S.income);
+  document.getElementById('d-bills').textContent=fmt(bt);
+  document.getElementById('d-needs').textContent=fmt(nt);
+  const bel=document.getElementById('list-bills');
+  bel.innerHTML=S.bills.length?S.bills.map(b=>`<div class="row"><div style="flex:1;min-width:0"><div class="rlbl">${b.name}</div><div class="rsub">${[b.dueDay?`Due ${ord(b.dueDay)}`:null,b.balance?`$${b.balance.toLocaleString()} owed`:null].filter(Boolean).join(' · ')}</div></div><span class="ramt">${fmt(b.amt)}</span><button class="xbtn" onclick="remBill(${b.id})">✕</button></div>`).join(''):'<p class="empty">No bills yet</p>';
+  const nel=document.getElementById('list-needs');
+  nel.innerHTML=S.needs.length?S.needs.map(n=>`<div class="row"><span class="rlbl">${n.name}</span><span class="ramt">${fmt(n.amt)}</span><button class="xbtn" onclick="remNeed(${n.id})">✕</button></div>`).join(''):'<p class="empty">No necessities yet</p>';
+}
+
+function renderChecks(){
+  const el=document.getElementById('checks-body');
+  const paydays=getPaydays(4);
+  if(!paydays.length){el.innerHTML='<div class="empty-state">Set your pay schedule in the Budget tab to see which bills land on each check.</div>';return;}
+  const pc=perCheckIncome();const cls=['','c2','c3'];let html='';
+  for(let i=0;i<3&&i<paydays.length-1;i++){
+    const payday=paydays[i],endDate=new Date(paydays[i+1].getTime()-86400000);
+    const bills=getBillsInPeriod(payday,endDate);
+    const total=bills.reduce((s,b)=>s+b.amt,0),rem=pc-total;
+    const noDue=S.bills.filter(b=>!b.dueDay).length;
+    html+=`<div class="pcrd ${cls[i]}"><div class="phead">Paycheck — ${fdate(payday)}</div><div class="psub">Bills due through ${fdate(endDate)}</div>${bills.length?bills.map(b=>`<div class="prow"><span>${b.name}<span class="prow-due">due ${fdate(b.dueDate)}</span></span><span>${fmt(b.amt)}</span></div>`).join(''):'<div style="font-size:13px;color:#bbb;padding:4px 0">No bills due this period</div>'}<div class="prow"><span>Bills subtotal</span><span>${fmt(total)}</span></div>${S.income?`<div class="prow"><span class="${rem<0?'over-lbl':'under-lbl'}">${rem<0?'Over by':'Left after bills'}</span><span class="${rem<0?'over-lbl':'under-lbl'}">${fmt(Math.abs(rem))}</span></div>`:''} ${noDue?`<div class="hint">${noDue} bill${noDue>1?'s have':' has'} no due date — add one in Budget.</div>`:''}</div>`;
+  }
+  el.innerHTML=html;
+}
+
+function renderPayoff(){
+  const el=document.getElementById('payoff-body');
+  const withBal=S.bills.filter(b=>b.balance>0).sort((a,b)=>a.balance-b.balance);
+  if(!withBal.length){el.innerHTML='<div class="empty-state">Add a "balance owed" to any bill in the Budget tab to see your payoff priority here.</div>';return;}
+  const totalBal=withBal.reduce((s,b)=>s+b.balance,0);
+  let html=`<div class="tip">Sorted by smallest balance first (snowball method). Put any extra money toward #1 first — each bill you knock out frees up more cash for the next one.</div>`;
+  withBal.forEach((b,i)=>{
+    const months=b.amt>0?Math.ceil(b.balance/b.amt):null;
+    html+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:flex-start;padding:14px 16px;gap:12px"><div class="rank ${i===0?'r1':''}">#${i+1}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">${b.name}${i===0?'<span class="badge">Pay first</span>':''}</div><div style="font-size:13px;color:#666;margin-top:4px">Balance: <b>$${b.balance.toLocaleString()}</b></div><div style="font-size:13px;color:#666">Payment: ${fmt(b.amt)}/mo</div>${months?`<div style="font-size:12px;color:#aaa;margin-top:2px">~${months} months at current rate</div>`:''}</div></div></div>`;
+  });
+  html+=`<div style="text-align:right;font-size:13px;color:#888;padding:4px 0">Total owed: <b>$${totalBal.toLocaleString()}</b></div>`;
+  el.innerHTML=html;
+}
+
+function renderOverview(){
+  const income=S.income||0,bt=S.bills.reduce((s,x)=>s+x.amt,0),nt=S.needs.reduce((s,x)=>s+x.amt,0),rem=income-bt-nt;
+  const bp=pct(bt,income),np=pct(nt,income),rp=Math.max(0,100-bp-np);
+  document.getElementById('s-inc').textContent=fmt(income);
+  document.getElementById('s-bil').textContent=fmt(bt);
+  document.getElementById('s-nds').textContent=fmt(nt);
+  document.getElementById('s-rem').textContent=fmt(Math.max(rem,0));
+  document.getElementById('s-bilpct').textContent=bp+'% of income';
+  document.getElementById('s-ndspct').textContent=np+'% of income';
+  document.getElementById('s-rempct').textContent=rp+'% of income';
+  document.getElementById('bar-used').textContent=Math.min(100,bp+np)+'% used';
+  document.getElementById('bar-b').style.width=bp+'%';
+  document.getElementById('bar-n').style.width=Math.min(np,100-bp)+'%';
+  document.getElementById('bar-r').style.width=rp+'%';
+  document.getElementById('m-rem').className='metric'+(rem<0?' warn-m':rp>=15?' hi':'');
+  document.getElementById('s-lb').innerHTML=S.bills.length?S.bills.map(b=>`<div class="row"><div style="flex:1"><div class="rlbl">${b.name}</div>${b.dueDay?`<div class="rsub">Due ${ord(b.dueDay)}</div>`:''}</div><span class="ramt">${fmt(b.amt)}</span></div>`).join(''):'<p class="empty">None added</p>';
+  document.getElementById('s-ln').innerHTML=S.needs.length?S.needs.map(n=>`<div class="row"><span class="rlbl">${n.name}</span><span class="ramt">${fmt(n.amt)}</span></div>`).join(''):'<p class="empty">None added</p>';
+}
+
+function onIncome(){S.income=parseFloat(document.getElementById('in-income').value)||0;render();save();}
+function addBill(){
+  const name=document.getElementById('bn').value.trim(),amt=parseFloat(document.getElementById('ba').value)||0,dueDay=parseInt(document.getElementById('bd').value)||null,balance=parseFloat(document.getElementById('bb').value)||0;
+  if(!name||amt<=0)return;
+  S.bills.push({id:Date.now(),name,amt,dueDay,balance});
+  ['bn','ba','bd','bb'].forEach(id=>document.getElementById(id).value='');
+  render();save();
+}
+function remBill(id){S.bills=S.bills.filter(b=>b.id!==id);render();save();}
+function addNeed(){
+  const name=document.getElementById('nn').value.trim(),amt=parseFloat(document.getElementById('na').value)||0;
+  if(!name||amt<=0)return;
+  S.needs.push({id:Date.now(),name,amt});
+  document.getElementById('nn').value='';document.getElementById('na').value='';
+  render();save();
+}
+function remNeed(id){S.needs=S.needs.filter(n=>n.id!==id);render();save();}
+function tog(id){
+  openSec[id]=!openSec[id];
+  document.getElementById('b-'+id).style.display=openSec[id]?'block':'none';
+  document.getElementById('cv-'+id).style.transform=openSec[id]?'rotate(180deg)':'';
+}
+function showTab(t){
+  ['budget','checks','payoff','overview'].forEach(id=>{
+    document.getElementById('v-'+id).style.display=t===id?'block':'none';
+    document.getElementById('t-'+id).className='tab'+(t===id?' on':'');
+  });
+}
+load();
+</script>
+</body>
+</html>
